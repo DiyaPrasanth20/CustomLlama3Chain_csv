@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
 from langchain_community.llms import Ollama
 from pymongo import MongoClient
-from chromadb import Chroma
-from langchain.embeddings import HuggingFaceEmbeddings
+#from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Chroma
 
 
 # Embedding and text splitting functions
@@ -49,13 +50,23 @@ def mongodbPost():
         collection = db[collection_name]
         docs = list(collection.find({}))
         all_docs.extend(docs)
+
+    print(all_docs[0])
     
     print(f"Total docs len={len(all_docs)}")
 
     # Convert docs to text
     texts = [str(doc) for doc in all_docs]
+    print(type(texts[0]))
+    print(type(texts))
 
-    chunks = text_splitter.split_documents(texts)
+    long_string = "".join(texts)
+    print(type(long_string))
+
+
+    #chunks = text_splitter.split_documents(texts)
+    chunks = text_splitter.split_documents([long_string])
+    print("no problem here")
     print(f"chunks len={len(chunks)}")
 
     vector_store = Chroma.from_documents(
